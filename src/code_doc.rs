@@ -112,12 +112,58 @@ impl CodeDoc {
         return result;
     }
 
-    pub fn get_runnable_code(&self, node: DocNodeId) -> Vec<RunnableCode> {
-        let mut langs = Vec::new();
+    fn is_anscestor(&self, anscestor: DocNodeId, mut child: DocNodeId) -> bool {
+        assert!(anscestor < self.nodes.len());
+        assert!(anscestor != DOC_NODE_ROOT_ID);
+        assert!(child < self.nodes.len());
+        assert!(child != DOC_NODE_ROOT_ID);
 
-        for cb in self.nodes[node].code_blocks.iter() {
-            if !langs.contains(&cb.interpreter) {
-                langs.push(cb.interpreter.clone());
+        while child != DOC_NODE_ROOT_ID && child != anscestor {
+            child = self.parent[child];
+        }
+        return child == anscestor;
+    }
+
+    fn get_ancestors(&self, node: DocNodeId) -> Vec<DocNodeId> {
+        assert!(node < self.nodes.len());
+        assert!(node != DOC_NODE_ROOT_ID);
+        let mut res = Vec::new();
+        for ances in (DOC_NODE_ROOT_ID + 1)..node {
+            if self.is_anscestor(ances, node) {
+                res.push(ances);
+            }
+        }
+        return res;
+    }
+
+    fn get_descendants(&self, node: DocNodeId) -> Vec<DocNodeId> {
+        assert!(node < self.nodes.len());
+        assert!(node != DOC_NODE_ROOT_ID);
+        let mut res = Vec::new();
+        for child in (node + 1)..self.nodes.len() {
+            if self.is_anscestor(node, child) {
+                res.push(child);
+            }
+        }
+        return res;
+    }
+
+    pub fn get_runnable_code(&self, node: DocNodeId) -> Vec<RunnableCode> {
+        let mut nodes = Vec::new();
+        nodes.extend(self.get_ancestors(node));
+        nodes.push(node);
+        let mut fullname = Vec::new();
+        for n in &nodes {
+            fullname.push(self.get_node(*n).name.clone());
+        }
+        nodes.extend(self.get_descendants(node));
+
+        let mut langs = Vec::new();
+        for n in &nodes {
+            for cb in self.get_node(*n).code_blocks.iter() {
+                if !langs.contains(&cb.interpreter) {
+                    langs.push(cb.interpreter.clone());
+                }
             }
         }
 
@@ -125,25 +171,18 @@ impl CodeDoc {
 
         for l in langs.iter() {
             let mut blocks = Vec::new();
-            let mut current = node;
-            let mut fullname = Vec::new();
-            while current != DOC_NODE_ROOT_ID {
+            for n in &nodes {
                 blocks.extend(
-                    self.nodes[current]
+                    self.get_node(*n)
                         .code_blocks
                         .iter()
-                        .rev()
                         .filter(|x| &x.interpreter == l)
                         .map(|x| x.code.clone()),
-                );
-                fullname.push(self.nodes[current].name.clone());
-                current = self.parent[current];
+                )
             }
-            fullname.reverse();
-            blocks.reverse();
             result.push(RunnableCode {
                 interpreter: l.to_string(),
-                fullname: fullname,
+                fullname: fullname.clone(),
                 code: blocks,
             })
         }

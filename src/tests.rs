@@ -91,8 +91,9 @@ fn doc_get_code1() {
         ],
     );
     let code = doc.get_runnable_code(sec);
-    assert_eq!(code.len(), 1);
+    assert_eq!(code.len(), 2);
     assert_eq!(code[0].code.join(""), "h1codecodesec1body");
+    assert_eq!(code[1].code.join(""), "h2");
 }
 
 #[test]
@@ -115,6 +116,9 @@ bash code
 hehe
 ** header 2.2
 h2.2 body
+#+begin_src bash
+h2.2 code
+#+end_src
 
 "###;
     let doc = parse_org_doc(&mut doc_str.as_bytes(), "doc_root".to_string(), "bash").unwrap();
@@ -134,6 +138,18 @@ h2.2 body
         codes[0].code.join("\n"),
         r###"intro src
 bash code"###
+    );
+
+    let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &["header 1"]);
+    assert_eq!(nodes.len(), 1);
+    let codes = doc.get_runnable_code(nodes[0]);
+    assert_eq!(codes.len(), 1);
+    assert_eq!(codes[0].fullname, vec!["doc_root", "header 1"]);
+    assert_eq!(
+        codes[0].code.join("\n"),
+        r###"intro src
+bash code
+h2.2 code"###
     );
 }
 
