@@ -41,29 +41,28 @@ fn main() -> Result<()> {
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("job")
-                .help("job to run")
-                .required(false)
-                .index(1),
-        )
-        .arg(
             Arg::with_name("action")
-                .short("a")
-                .long("action")
                 .help("action to do with the job")
-                .default_value("run")
+                .index(1)
+                .required(true)
                 .possible_values(&["run", "list", "show"]),
         )
         .arg(
+            Arg::with_name("job")
+                .help("job to run")
+                .required(false)
+                .index(2),
+        )
+        .arg(
             Arg::with_name("lang")
-                .short("l")
-                .long("lang")
-                .help("specify script language in case of ambiguity"),
+                .help("specify script language in case of ambiguity")
+                .required(false)
+                .index(3),
         )
         .get_matches();
 
-    let org_file = matches.value_of("org_file").unwrap();
     let action = matches.value_of("action").unwrap();
+    let org_file = matches.value_of("org_file").unwrap();
     let mut reader = BufReader::new(match File::open(org_file) {
         Ok(f) => f,
         Err(_) => {
@@ -146,9 +145,9 @@ fn main() -> Result<()> {
 
             for node in (DOC_NODE_ROOT_ID + 1)..=doc.len() {
                 for _ in 0..doc.get_node(node).level() {
-                    print!("  ");
+                    print!("*");
                 }
-                println!("{}", doc.get_node(node).name());
+                println!(" {}", doc.get_node(node).name());
             }
         }
     };

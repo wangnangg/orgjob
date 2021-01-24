@@ -9,7 +9,7 @@ VAR=hello
 
 * header 1
 h1 body
-**  header 2.1
+** header 2.1
 h2.1 body
 #+BEGIN_SRC bash
 echo "$VAR world"
