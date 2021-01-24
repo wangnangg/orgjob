@@ -13,8 +13,8 @@ pub enum DocParseError {
 
 pub fn parse_org_doc<T: BufRead>(f: &mut T, docname: String) -> Result<CodeDoc, DocParseError> {
     let mut doc = CodeDoc::new();
-    let begin_src_re = Regex::new(r"^#\+BEGIN_SRC(?:\s+(\w+))?(?:\s+.*)?").unwrap();
-    let end_src_re = Regex::new(r"^#\+END_SRC(?:\s+.*)?").unwrap();
+    let begin_src_re = Regex::new(r"^#\+(?i)BEGIN_SRC(?:\s+(\w+))?(?:\s+.*)?").unwrap();
+    let end_src_re = Regex::new(r"^#\+(?i)END_SRC(?:\s+.*)?").unwrap();
     let hdr_re = Regex::new(r"(\*+) (.+)").unwrap();
 
     #[derive(PartialEq, Copy, Clone, Debug)]

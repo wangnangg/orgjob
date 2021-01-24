@@ -109,9 +109,9 @@ intro src
 h1 body
 ** header 2.1
 h2.1 body
-#+BEGIN_SRC bash
+#+begin_src bash
 bash code
-#+END_SRC
+#+end_src
 hehe
 ** header 2.2
 h2.2 body
