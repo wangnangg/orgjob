@@ -70,7 +70,13 @@ fn main() -> Result<()> {
             exit(1);
         }
     });
-    let doc = parse_org_doc(&mut reader, "doc".to_string(), "bash").unwrap();
+    let doc = match parse_org_doc(&mut reader, "doc".to_string(), "bash") {
+        Ok(d) => d,
+        Err(e) => {
+            println!("{:?}", e);
+            exit(1);
+        }
+    };
 
     match matches.value_of("job") {
         Some(job) => {
