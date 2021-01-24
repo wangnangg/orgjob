@@ -1,0 +1,24 @@
+#+TITLE: Test Doc
+
+
+this is intro.
+
+#+BEGIN_SRC bash
+VAR=hello
+#+END_SRC
+
+* header 1
+h1 body
+**  header 2.1
+h2.1 body
+#+BEGIN_SRC bash
+echo "$VAR world"
+exit 3
+#+END_SRC
+hehe
+
+** header 2.2
+h2.2 body
+#+BEGIN_SRC bash
+body 2 code
+#+END_SRC
