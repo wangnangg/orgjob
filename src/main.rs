@@ -123,7 +123,7 @@ fn main() -> Result<()> {
                         }
                     } else {
                         //show
-                        println!("#!{}", c.interpreter);
+                        println!("#!/usr/bin/env {}", c.interpreter);
                         println!("{}", c.code.join("\n"));
                         exit(0);
                     }
