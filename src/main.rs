@@ -71,7 +71,7 @@ fn main() -> Result<()> {
             exit(1);
         }
     });
-    let doc = parse_org_doc(&mut reader, "doc".to_string()).unwrap();
+    let doc = parse_org_doc(&mut reader, "doc".to_string(), "bash").unwrap();
 
     match matches.value_of("job") {
         Some(job) => {

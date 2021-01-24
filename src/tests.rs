@@ -117,7 +117,7 @@ hehe
 h2.2 body
 
 "###;
-    let doc = parse_org_doc(&mut doc_str.as_bytes(), "doc_root".to_string()).unwrap();
+    let doc = parse_org_doc(&mut doc_str.as_bytes(), "doc_root".to_string(), "bash").unwrap();
     assert_eq!(doc.len(), 4);
 
     let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &["2.1"]);
@@ -134,6 +134,48 @@ h2.2 body
         codes[0].code.join("\n"),
         r###"intro src
 bash code"###
+    );
+}
+
+#[test]
+fn parse_test2() {
+    let doc_str = r###"
+#+TITLE: Test Doc
+
+this is intro.
+#+BEGIN_SRC
+intro src
+#+END_SRC
+
+* header 1
+h1 body
+** header 2.1
+h2.1 body
+#+begin_src
+shell code
+#+end_src
+hehe
+** header 2.2
+h2.2 body
+
+"###;
+    let doc = parse_org_doc(&mut doc_str.as_bytes(), "doc_root".to_string(), "bash").unwrap();
+    assert_eq!(doc.len(), 4);
+
+    let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &["2.1"]);
+    assert_eq!(nodes.len(), 1);
+    let codes = doc.get_runnable_code(nodes[0]);
+    assert_eq!(codes.len(), 1);
+
+    assert_eq!(
+        codes[0].fullname,
+        vec!["doc_root", "header 1", "header 2.1"]
+    );
+
+    assert_eq!(
+        codes[0].code.join("\n"),
+        r###"intro src
+shell code"###
     );
 }
 

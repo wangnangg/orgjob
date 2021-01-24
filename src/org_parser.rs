@@ -11,7 +11,11 @@ pub enum DocParseError {
     UnexpectedLine { linum: usize, line: String },
 }
 
-pub fn parse_org_doc<T: BufRead>(f: &mut T, docname: String) -> Result<CodeDoc, DocParseError> {
+pub fn parse_org_doc<T: BufRead>(
+    f: &mut T,
+    docname: String,
+    default_lang: &str,
+) -> Result<CodeDoc, DocParseError> {
     let mut doc = CodeDoc::new();
     let begin_src_re = Regex::new(r"^#\+(?i)BEGIN_SRC(?:\s+(\w+))?(?:\s+.*)?").unwrap();
     let end_src_re = Regex::new(r"^#\+(?i)END_SRC(?:\s+.*)?").unwrap();
@@ -41,7 +45,11 @@ pub fn parse_org_doc<T: BufRead>(f: &mut T, docname: String) -> Result<CodeDoc, 
         match state {
             State::TEXT => {
                 if let Some(caps) = begin_src_re.captures(&line) {
-                    interpreter = caps[1].to_string();
+                    interpreter = caps
+                        .get(1)
+                        .and_then(|x| Some(x.as_str()))
+                        .unwrap_or(default_lang)
+                        .to_string();
                     code_lines = Vec::new();
                     state = State::SRC;
                     code_hdr_line = line.to_string();
