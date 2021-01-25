@@ -75,9 +75,11 @@ fn main() -> Result<()> {
         }
     };
 
+    let sep = ".";
+
     match matches.value_of("job") {
         Some(job) => {
-            let query: Vec<&str> = job.split("::").collect();
+            let query: Vec<&str> = job.split(sep).collect();
             let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &query);
             match nodes.len() {
                 0 => {
@@ -137,7 +139,7 @@ fn main() -> Result<()> {
                 _ => {
                     println!("multiple matches for: {:?}", query);
                     for n in nodes {
-                        println!("{}", doc.get_fullname(n).join("::"));
+                        println!("{}", doc.get_fullname(n).join(sep));
                     }
                     exit(1);
                 }
