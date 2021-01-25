@@ -111,6 +111,9 @@ fn main() -> Result<()> {
                                 }
                             } else {
                                 println!("mutliple languages in the matched block; use -l/--lang");
+                                for c in &code {
+                                    println!("{}", c.interpreter);
+                                }
                                 exit(1);
                             }
                         }
@@ -134,7 +137,7 @@ fn main() -> Result<()> {
                 _ => {
                     println!("multiple matches for: {:?}", query);
                     for n in nodes {
-                        println!("{}", doc.get_node(n).name());
+                        println!("{}", doc.get_fullname(n).join("::"));
                     }
                     exit(1);
                 }

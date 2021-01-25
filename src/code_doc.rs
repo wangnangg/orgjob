@@ -148,14 +148,19 @@ impl CodeDoc {
         return res;
     }
 
+    pub fn get_fullname(&self, node: DocNodeId) -> Vec<String> {
+        let mut fullname = Vec::new();
+        for n in self.get_ancestors(node) {
+            fullname.push(self.get_node(n).name.clone());
+        }
+        fullname.push(self.get_node(node).name.clone());
+        return fullname;
+    }
+
     pub fn get_runnable_code(&self, node: DocNodeId) -> Vec<RunnableCode> {
         let mut nodes = Vec::new();
         nodes.extend(self.get_ancestors(node));
         nodes.push(node);
-        let mut fullname = Vec::new();
-        for n in &nodes {
-            fullname.push(self.get_node(*n).name.clone());
-        }
         nodes.extend(self.get_descendants(node));
 
         let mut langs = Vec::new();
@@ -182,7 +187,7 @@ impl CodeDoc {
             }
             result.push(RunnableCode {
                 interpreter: l.to_string(),
-                fullname: fullname.clone(),
+                fullname: self.get_fullname(node),
                 code: blocks,
             })
         }
