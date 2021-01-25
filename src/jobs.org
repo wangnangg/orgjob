@@ -20,5 +20,8 @@ hehe
 ** header 2.2
 h2.2 body
 #+BEGIN_SRC bash
-body 2 code
+echo say something:
+read A
+echo you said: $A
+exit 4
 #+END_SRC

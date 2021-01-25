@@ -1,10 +1,12 @@
 extern crate clap;
+extern crate tempfile;
 
 use clap::{App, Arg};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Result, Write};
 use std::process::exit;
 use std::vec::Vec;
+use tempfile::tempfile;
 
 mod code_doc;
 mod org_parser;
@@ -16,15 +18,10 @@ use org_parser::*;
 use std::process::{Command, ExitStatus, Stdio};
 
 fn run_code(interpreter: &str, code: &str) -> Result<ExitStatus> {
-    let mut shell = Command::new(interpreter).stdin(Stdio::piped()).spawn()?;
-
-    {
-        let mut shell_in = shell.stdin.take().unwrap();
-        let mut writer = BufWriter::new(&mut shell_in);
-        writer.write_all(code.as_bytes())?;
-        writer.flush()?;
-    }
-
+    let mut script_file = tempfile::NamedTempFile::new()?;
+    script_file.write_all(code.as_bytes())?;
+    script_file.flush()?;
+    let mut shell = Command::new(interpreter).arg(script_file.path()).spawn()?;
     return shell.wait();
 }
 
