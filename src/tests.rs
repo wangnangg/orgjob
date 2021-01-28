@@ -90,7 +90,7 @@ fn doc_get_code1() {
             },
         ],
     );
-    let code = doc.get_runnable_code(sec);
+    let code = doc.get_runnable_code(sec, "");
     assert_eq!(code.len(), 2);
     assert_eq!(code[0].code.join(""), "h1codecodesec1body");
     assert_eq!(code[1].code.join(""), "h2");
@@ -126,7 +126,7 @@ h2.2 code
 
     let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &["2.1"]);
     assert_eq!(nodes.len(), 1);
-    let codes = doc.get_runnable_code(nodes[0]);
+    let codes = doc.get_runnable_code(nodes[0], "");
     assert_eq!(codes.len(), 1);
 
     assert_eq!(
@@ -142,7 +142,7 @@ bash code"###
 
     let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &["header 1"]);
     assert_eq!(nodes.len(), 1);
-    let codes = doc.get_runnable_code(nodes[0]);
+    let codes = doc.get_runnable_code(nodes[0], "");
     assert_eq!(codes.len(), 1);
     assert_eq!(codes[0].fullname, vec!["doc_root", "header 1"]);
     assert_eq!(
@@ -180,7 +180,7 @@ h2.2 body
 
     let nodes = doc.lookup_nodes(DOC_NODE_ROOT_ID, &["2.1"]);
     assert_eq!(nodes.len(), 1);
-    let codes = doc.get_runnable_code(nodes[0]);
+    let codes = doc.get_runnable_code(nodes[0], "");
     assert_eq!(codes.len(), 1);
 
     assert_eq!(

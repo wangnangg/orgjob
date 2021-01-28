@@ -157,7 +157,7 @@ impl CodeDoc {
         return fullname;
     }
 
-    pub fn get_runnable_code(&self, node: DocNodeId) -> Vec<RunnableCode> {
+    pub fn get_runnable_code(&self, node: DocNodeId, sep: &str) -> Vec<RunnableCode> {
         let mut nodes = Vec::new();
         nodes.extend(self.get_ancestors(node));
         nodes.push(node);
@@ -177,13 +177,23 @@ impl CodeDoc {
         for l in langs.iter() {
             let mut blocks = Vec::new();
             for n in &nodes {
+                let fullname = self.get_fullname(*n);
+                if sep != "" {
+                    blocks.push(format!("echo {} start... 1>&2\n", fullname.join(sep)));
+                }
                 blocks.extend(
                     self.get_node(*n)
                         .code_blocks
                         .iter()
                         .filter(|x| &x.interpreter == l)
                         .map(|x| x.code.clone()),
-                )
+                );
+                if sep != "" {
+                    blocks.push(format!("echo {} done! 1>&2\n", fullname.join(sep)));
+                }
+            }
+            if sep != "" {
+                blocks.push(format!("echo ALL done! 1>&2\n"));
             }
             result.push(RunnableCode {
                 interpreter: l.to_string(),

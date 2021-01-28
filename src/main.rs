@@ -89,7 +89,7 @@ fn main() -> Result<()> {
                 1 => {
                     let n = nodes[0];
                     let node = doc.get_node(n);
-                    let code = doc.get_runnable_code(n);
+                    let code = doc.get_runnable_code(n, sep);
                     let mut selected_code = None;
                     match code.len() {
                         0 => {
@@ -152,10 +152,7 @@ fn main() -> Result<()> {
             }
 
             for node in (DOC_NODE_ROOT_ID + 1)..=doc.len() {
-                for _ in 0..doc.get_node(node).level() {
-                    print!("*");
-                }
-                println!(" {}", doc.get_node(node).name());
+                println!("{}", doc.get_fullname(node).join(sep));
             }
         }
     };
