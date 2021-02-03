@@ -201,8 +201,24 @@ fn run_code1() {
 echo hello world from run_code1
 exit 42
 "###;
-    match run_code("bash", code).unwrap().code() {
+    let args: Vec<&OsStr> = vec![];
+    match run_code("bash", code, &args).unwrap().code() {
         Some(code) => assert_eq!(code, 42),
+        None => assert!(false),
+    };
+}
+
+#[test]
+fn run_code_args() {
+    let code = r###"
+echo "one:$1"
+echo "two:$2"
+"###;
+    let args: Vec<&OsStr> = vec![OsStr::new("aaa"), OsStr::new("bbb")];
+    match run_code("bash", code, &args).unwrap().code() {
+        Some(code) => {
+            assert_eq!(code, 0);
+        }
         None => assert!(false),
     };
 }

@@ -25,3 +25,8 @@ read A
 echo you said: $A
 exit 4
 #+END_SRC
+** args
+#+begin_src bash
+echo "one:$1"
+echo "two:$2"
+#+end_src

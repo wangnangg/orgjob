@@ -2,11 +2,11 @@ extern crate clap;
 extern crate tempfile;
 
 use clap::{App, Arg};
+use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Result, Write};
+use std::io::{BufReader, Result, Write};
 use std::process::exit;
 use std::vec::Vec;
-use tempfile::tempfile;
 
 mod code_doc;
 mod org_parser;
@@ -15,13 +15,19 @@ mod tests;
 
 use code_doc::*;
 use org_parser::*;
-use std::process::{Command, ExitStatus, Stdio};
+use std::process::{Command, ExitStatus};
 
-fn run_code(interpreter: &str, code: &str) -> Result<ExitStatus> {
+fn run_code<S: AsRef<OsStr>>(interpreter: &str, code: &str, args: &[S]) -> Result<ExitStatus> {
     let mut script_file = tempfile::NamedTempFile::new()?;
+    let mut args_vec = Vec::new();
+    let fname = script_file.path().as_os_str().to_owned();
+    args_vec.push(fname.as_os_str());
+    for arg in args {
+        args_vec.push(arg.as_ref());
+    }
     script_file.write_all(code.as_bytes())?;
     script_file.flush()?;
-    let mut shell = Command::new(interpreter).arg(script_file.path()).spawn()?;
+    let mut shell = Command::new(interpreter).args(&args_vec).spawn()?;
     return shell.wait();
 }
 
@@ -38,6 +44,14 @@ fn main() -> Result<()> {
                 .takes_value(true),
         )
         .arg(
+            Arg::with_name("lang")
+                .short("l")
+                .long("--lang")
+                .value_name("LANG")
+                .help("specify script language in case of ambiguity")
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("action")
                 .help("action to do with the job")
                 .index(1)
@@ -51,9 +65,10 @@ fn main() -> Result<()> {
                 .index(2),
         )
         .arg(
-            Arg::with_name("lang")
-                .help("specify script language in case of ambiguity")
+            Arg::with_name("args")
+                .help("arguments for the job")
                 .required(false)
+                .multiple(true)
                 .index(3),
         )
         .get_matches();
@@ -122,7 +137,8 @@ fn main() -> Result<()> {
                     };
                     let c = selected_code.unwrap();
                     if action == "run" {
-                        match run_code(&c.interpreter, &c.code.join("\n"))?.code() {
+                        let args: Vec<_> = matches.values_of("args").unwrap().collect();
+                        match run_code(&c.interpreter, &c.code.join("\n"), &args)?.code() {
                             Some(code) => exit(code),
                             None => {
                                 println!("subprocess killed");
