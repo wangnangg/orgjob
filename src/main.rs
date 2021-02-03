@@ -137,7 +137,10 @@ fn main() -> Result<()> {
                     };
                     let c = selected_code.unwrap();
                     if action == "run" {
-                        let args: Vec<_> = matches.values_of("args").unwrap().collect();
+                        let args: Vec<_> = match matches.values_of("args") {
+                            Some(vs) => vs.collect(),
+                            None => vec![],
+                        };
                         match run_code(&c.interpreter, &c.code.join("\n"), &args)?.code() {
                             Some(code) => exit(code),
                             None => {
