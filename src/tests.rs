@@ -214,7 +214,7 @@ fn run_code_args() {
 echo "one:$1"
 echo "two:$2"
 "###;
-    let args: Vec<&OsStr> = vec![OsStr::new("aaa"), OsStr::new("bbb")];
+    let args = vec!["aaa", "bbb"];
     match run_code("bash", code, &args).unwrap().code() {
         Some(code) => {
             assert_eq!(code, 0);
