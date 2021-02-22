@@ -56,6 +56,7 @@ fn main() -> Result<()> {
                 .help("action to do with the job")
                 .index(1)
                 .required(true)
+                .default_value("list")
                 .possible_values(&["run", "list", "show"]),
         )
         .arg(
